@@ -1,78 +1,69 @@
 import request from '../utils/request'
 
-export function searchVideo(keyword) {
+export function login(username, password) {
+  return request({
+    url: '/auth/login',
+    method: 'POST',
+    data: { username, password }
+  })
+}
+
+export function getVideos(page = 1, limit = 20) {
+  return request({
+    url: '/videos',
+    method: 'GET',
+    data: { page, limit }
+  })
+}
+
+export function searchVideos(keyword, page = 1) {
   return request({
     url: '/search',
-    method: 'get',
-    params: { q: keyword }
+    method: 'GET',
+    data: { q: keyword, page }
   })
 }
 
-export function getVideoDetail(id, source) {
+export function getVideoDetail(id) {
   return request({
-    url: '/detail',
-    method: 'get',
-    params: { id, source }
+    url: `/videos/${id}`,
+    method: 'GET'
   })
 }
 
-export function getDoubanDetail(id) {
+export function getVideoPlayUrl(id, episode = 1) {
   return request({
-    url: '/douban/details',
-    method: 'get',
-    params: { id }
+    url: `/videos/${id}/play`,
+    method: 'GET',
+    data: { episode }
   })
 }
 
 export function getCategories() {
   return request({
-    url: '/source-browser/categories',
-    method: 'get'
+    url: '/categories',
+    method: 'GET'
   })
 }
 
-export function getSourceList() {
-  return request({
-    url: '/source-browser/list',
-    method: 'get'
-  })
-}
-
-export function getFavorites(params) {
+export function getFavorites() {
   return request({
     url: '/favorites',
-    method: 'get',
-    params
+    method: 'GET'
   })
 }
 
-export function addFavorite(data) {
+export function addFavorite(videoId) {
   return request({
     url: '/favorites',
-    method: 'post',
-    data
+    method: 'POST',
+    data: { videoId }
   })
 }
 
 export function removeFavorite(id) {
   return request({
     url: `/favorites/${id}`,
-    method: 'delete'
-  })
-}
-
-export function getHotVideos(limit = 10) {
-  return request({
-    url: '/search',
-    method: 'get',
-    params: { q: '', limit }
-  })
-}
-
-export function getLatestVideos(page = 1, limit = 10) {
-  return request({
-    url: '/search',
-    method: 'get',
-    params: { page, limit }
+    method: 'DELETE'
   })
 }

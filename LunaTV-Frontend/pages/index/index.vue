@@ -1,300 +1,189 @@
 <template>
-  <view class="container">
+  <view class="home-page">
     <view class="header">
       <text class="title">LunaTV</text>
-      <view class="header-actions">
-        <uni-icons type="scan" size="24" color="#fff" @click="handleScan"></uni-icons>
-      </view>
+      <text class="user-info">{{ userStore.username }}</text>
     </view>
-
-    <scroll-view scroll-y class="content">
-      <view class="hero-section" v-if="heroList.length > 0">
-        <swiper class="hero-swiper" autoplay circular indicator-dots>
-          <swiper-item v-for="(item, index) in heroList" :key="index" @click="handleHeroClick(item)">
-            <image class="hero-image" :src="item.vod_pic" mode="aspectFill"></image>
-            <view class="hero-overlay">
-              <text class="hero-title">{{ item.vod_name }}</text>
-              <text class="hero-subtitle">{{ item.vod_remarks }}</text>
-            </view>
-          </swiper-item>
-        </swiper>
-      </view>
-
-      <view class="quick-actions">
-        <view class="action-item" v-for="(action, index) in quickActions" :key="index" @click="handleQuickAction(action)">
-          <uni-icons :type="action.icon" size="28" :color="action.color"></uni-icons>
-          <text class="action-text">{{ action.text }}</text>
-        </view>
-      </view>
-
-      <view class="section" v-for="section in sections" :key="section.title">
-        <view class="section-header">
-          <text class="section-title">{{ section.title }}</text>
-          <text class="section-more" @click="handleMore(section)">更多 ></text>
-        </view>
-        <scroll-view scroll-x class="section-content">
-          <view class="video-card" v-for="(video, index) in section.videos" :key="index" @click="handleVideoClick(video)">
-            <image class="card-image" :src="video.vod_pic" mode="aspectFill"></image>
-            <view class="card-info">
-              <text class="card-title">{{ video.vod_name }}</text>
-              <text class="card-remarks">{{ video.vod_remarks }}</text>
-            </view>
+    
+    <scroll-view scroll-y class="content" @scrolltolower="loadMore">
+      <view class="video-list">
+        <view 
+          class="video-item" 
+          v-for="(item, index) in videoList" 
+          :key="item.id"
+          :class="{ 'focused': focusedIndex === index }"
+          @click="handleVideoClick(item, index)"
+        >
+          <image class="video-poster" :src="item.poster" mode="aspectFill"></image>
+          <view class="video-info">
+            <text class="video-title">{{ item.title }}</text>
+            <text class="video-meta">{{ item.year }} · {{ item.type }}</text>
           </view>
-        </scroll-view>
+        </view>
+      </view>
+      
+      <view class="loading" v-if="loading">
+        <text>加载中...</text>
       </view>
     </scroll-view>
   </view>
 </template>
 
-<script setup>
+<script>
 import { ref, onMounted } from 'vue'
-import { useVideoStore } from '../../src/stores/video'
-import { useFavoriteStore } from '../../src/stores/favorite'
+import { getVideos } from '../../src/api/video'
 import { useUserStore } from '../../src/stores/user'
-import { getHotVideos, getLatestVideos } from '../../src/api/video'
 
-const videoStore = useVideoStore()
-const favoriteStore = useFavoriteStore()
-const userStore = useUserStore()
-
-const heroList = ref([])
-const sections = ref([])
-
-const quickActions = [
-  { icon: 'search', text: '搜索', color: '#e50914' },
-  { icon: 'star', text: '收藏', color: '#f5a623' },
-  { icon: 'calendar', text: '更新', color: '#50c878' },
-  { icon: 'fire', text: '热门', color: '#ff6b6b' }
-]
-
-onMounted(async () => {
-  console.log('Index onMounted, isLoggedIn:', userStore.isLoggedIn)
-  
-  if (!userStore.isLoggedIn) {
-    console.log('Not logged in, redirecting to login page')
-    uni.redirectTo({ url: '/pages/login/login' })
-    return
-  }
-
-  await fetchHomeData()
-})
-
-async function fetchHomeData() {
-  try {
-    await Promise.all([
-      fetchHeroSection(),
-      fetchSections()
-    ])
-  } catch (error) {
-    console.error('获取首页数据失败:', error)
-    uni.showToast({ title: '数据加载失败', icon: 'none' })
-  }
-}
-
-async function fetchHeroSection() {
-  try {
-    const response = await getHotVideos(5)
-    heroList.value = response.results || []
-  } catch (error) {
-    console.error('获取轮播图数据失败:', error)
-  }
-}
-
-async function fetchSections() {
-  try {
-    const [latestResponse] = await Promise.all([
-      getLatestVideos(1, 10)
-    ])
+export default {
+  setup() {
+    const userStore = useUserStore()
+    const videoList = ref([])
+    const loading = ref(false)
+    const currentPage = ref(1)
+    const focusedIndex = ref(-1)
     
-    sections.value = [
-      {
-        title: '最新更新',
-        type: 'latest',
-        videos: latestResponse.results || []
+    const loadVideos = async (page = 1) => {
+      if (loading.value) return
+      
+      loading.value = true
+      
+      try {
+        const res = await getVideos(page, 20)
+        
+        if (page === 1) {
+          videoList.value = res.data || []
+        } else {
+          videoList.value.push(...(res.data || []))
+        }
+      } catch (error) {
+        console.error('加载视频失败:', error)
+        uni.showToast({ title: '加载失败', icon: 'none' })
+      } finally {
+        loading.value = false
       }
-    ]
-  } catch (error) {
-    console.error('获取分区数据失败:', error)
+    }
+    
+    const loadMore = () => {
+      currentPage.value++
+      loadVideos(currentPage.value)
+    }
+    
+    const handleVideoClick = (video, index) => {
+      uni.navigateTo({
+        url: `/pages/detail/detail?id=${video.id}&title=${encodeURIComponent(video.title)}`
+      })
+    }
+    
+    onMounted(() => {
+      loadVideos()
+      
+      uni.onKeyboardHeightChange((res) => {
+        console.log('键盘高度变化:', res.height)
+      })
+    })
+    
+    return {
+      userStore,
+      videoList,
+      loading,
+      focusedIndex,
+      loadMore,
+      handleVideoClick
+    }
   }
-}
-
-function handleScan() {
-  uni.showToast({ title: '扫码功能开发中', icon: 'none' })
-}
-
-function handleQuickAction(action) {
-  if (action.text === '搜索') {
-    uni.navigateTo({ url: '/pages/search/search' })
-  } else if (action.text === '收藏') {
-    uni.navigateTo({ url: '/pages/favorites/favorites' })
-  } else {
-    uni.showToast({ title: `${action.text}功能开发中`, icon: 'none' })
-  }
-}
-
-function handleHeroClick(video) {
-  handleVideoClick(video)
-}
-
-function handleVideoClick(video) {
-  videoStore.setCurrentVideo(video)
-  uni.navigateTo({ url: `/pages/detail/detail?id=${video.vod_id}&source=${video.vod_source_from}` })
-}
-
-function handleMore(section) {
-  uni.navigateTo({ url: `/pages/category/category?type=${section.type}` })
 }
 </script>
 
-<style lang="scss" scoped>
-.container {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%);
+<style scoped>
+.home-page {
+  width: 100vw;
+  height: 100vh;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20rpx 40rpx;
-  background: rgba(13, 13, 13, 0.95);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  padding: 30rpx 40rpx;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10rpx);
 }
 
 .title {
   font-size: 48rpx;
   font-weight: bold;
   color: #e50914;
-  letter-spacing: 4rpx;
+  letter-spacing: 5rpx;
 }
 
-.header-actions {
-  display: flex;
-  gap: 20rpx;
+.user-info {
+  font-size: 28rpx;
+  color: #ffffff;
 }
 
 .content {
-  padding: 20rpx;
-}
-
-.hero-section {
-  margin-bottom: 40rpx;
-  border-radius: 20rpx;
-  overflow: hidden;
-}
-
-.hero-swiper {
-  height: 400rpx;
-  border-radius: 20rpx;
-}
-
-.hero-image {
-  width: 100%;
-  height: 100%;
-}
-
-.hero-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex: 1;
   padding: 30rpx;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
 }
 
-.hero-title {
-  display: block;
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 10rpx;
-}
-
-.hero-subtitle {
-  font-size: 24rpx;
-  color: #999;
-}
-
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20rpx;
-  margin-bottom: 40rpx;
-  padding: 30rpx;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20rpx;
-}
-
-.action-item {
+.video-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 10rpx;
+  gap: 20rpx;
 }
 
-.action-text {
-  font-size: 24rpx;
-  color: #fff;
-}
-
-.section {
-  margin-bottom: 50rpx;
-}
-
-.section-header {
+.video-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
+  gap: 30rpx;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16rpx;
+  border: 2rpx solid transparent;
+  transition: all 0.3s;
 }
 
-.section-title {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #fff;
+.video-item.focused {
+  background: rgba(229, 9, 20, 0.15);
+  border-color: #e50914;
+  transform: scale(1.02);
 }
 
-.section-more {
-  font-size: 24rpx;
-  color: #e50914;
-}
-
-.section-content {
-  white-space: nowrap;
-}
-
-.video-card {
-  display: inline-block;
-  width: 220rpx;
-  margin-right: 20rpx;
-  vertical-align: top;
-}
-
-.card-image {
-  width: 220rpx;
-  height: 320rpx;
+.video-poster {
+  width: 200rpx;
+  height: 300rpx;
   border-radius: 12rpx;
-  background: #2a2a2a;
+  flex-shrink: 0;
 }
 
-.card-info {
-  padding: 10rpx 0;
+.video-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15rpx;
 }
 
-.card-title {
-  display: block;
-  font-size: 24rpx;
-  color: #fff;
-  margin-bottom: 6rpx;
+.video-title {
+  font-size: 32rpx;
+  color: #ffffff;
+  font-weight: bold;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.card-remarks {
-  font-size: 20rpx;
+.video-meta {
+  font-size: 24rpx;
   color: #999;
+}
+
+.loading {
+  text-align: center;
+  padding: 40rpx;
+  color: #666;
 }
 </style>

@@ -1,56 +1,40 @@
-import axios from 'axios'
-import apiConfig from '../config/api'
-import { useUserStore } from '../stores/user'
+import config from '../config/config'
 
-const service = axios.create({
-  baseURL: apiConfig.baseURL,
-  timeout: apiConfig.timeout
-})
-
-service.interceptors.request.use(
-  config => {
-    const userStore = useUserStore()
-    if (userStore.token) {
-      config.headers.Authorization = `Bearer ${userStore.token}`
-    }
-    return config
-  },
-  error => {
-    console.error('请求错误:', error)
-    return Promise.reject(error)
-  }
-)
-
-service.interceptors.response.use(
-  response => {
-    return response.data
-  },
-  error => {
-    console.error('响应错误:', error)
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          uni.showToast({ title: '未授权', icon: 'none' })
-          break
-        case 403:
-          uni.showToast({ title: '禁止访问', icon: 'none' })
-          break
-        case 404:
-          uni.showToast({ title: '请求资源不存在', icon: 'none' })
-          break
-        case 500:
-          uni.showToast({ title: '服务器错误', icon: 'none' })
-          break
-        default:
-          uni.showToast({ title: error.response.data.message || '请求失败', icon: 'none' })
+function request(options) {
+  return new Promise((resolve, reject) => {
+    const token = uni.getStorageSync('token')
+    
+    uni.request({
+      url: config.baseUrl + options.url,
+      method: options.method || 'GET',
+      data: options.data || {},
+      header: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      timeout: options.timeout || config.timeout,
+      success: (res) => {
+        if (res.statusCode === 200) {
+          resolve(res.data)
+        } else if (res.statusCode === 401) {
+          uni.showToast({ title: '请先登录', icon: 'none' })
+          setTimeout(() => {
+            uni.removeStorageSync('token')
+            uni.redirectTo({ url: '/pages/login/login' })
+          }, 1500)
+          reject(res)
+        } else {
+          uni.showToast({ title: '请求失败', icon: 'none' })
+          reject(res)
+        }
+      },
+      fail: (err) => {
+        console.error('请求错误:', err)
+        uni.showToast({ title: '网络错误', icon: 'none' })
+        reject(err)
       }
-    } else if (error.request) {
-      uni.showToast({ title: '网络错误', icon: 'none' })
-    } else {
-      uni.showToast({ title: '请求配置错误', icon: 'none' })
-    }
-    return Promise.reject(error)
-  }
-)
+    })
+  })
+}
 
-export default service
+export default request

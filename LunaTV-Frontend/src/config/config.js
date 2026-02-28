@@ -1,0 +1,6 @@
+const config = {
+  baseUrl: 'https://any.lumi210.ggff.net/api',
+  timeout: 30000
+}
+
+export default config
