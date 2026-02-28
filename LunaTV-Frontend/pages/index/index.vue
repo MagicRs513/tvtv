@@ -50,6 +50,7 @@
 import { ref, onMounted } from 'vue'
 import { useVideoStore } from '../../src/stores/video'
 import { useFavoriteStore } from '../../src/stores/favorite'
+import { getHotVideos, getLatestVideos } from '../../src/api/video'
 
 const videoStore = useVideoStore()
 const favoriteStore = useFavoriteStore()
@@ -69,18 +70,42 @@ onMounted(async () => {
 })
 
 async function fetchHomeData() {
-  await Promise.all([
-    fetchHeroSection(),
-    fetchSections()
-  ])
+  try {
+    await Promise.all([
+      fetchHeroSection(),
+      fetchSections()
+    ])
+  } catch (error) {
+    console.error('获取首页数据失败:', error)
+    uni.showToast({ title: '数据加载失败', icon: 'none' })
+  }
 }
 
 async function fetchHeroSection() {
-  heroList.value = []
+  try {
+    const response = await getHotVideos(5)
+    heroList.value = response.results || []
+  } catch (error) {
+    console.error('获取轮播图数据失败:', error)
+  }
 }
 
 async function fetchSections() {
-  sections.value = []
+  try {
+    const [latestResponse] = await Promise.all([
+      getLatestVideos(1, 10)
+    ])
+    
+    sections.value = [
+      {
+        title: '最新更新',
+        type: 'latest',
+        videos: latestResponse.results || []
+      }
+    ]
+  } catch (error) {
+    console.error('获取分区数据失败:', error)
+  }
 }
 
 function handleScan() {

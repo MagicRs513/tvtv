@@ -60,3 +60,19 @@ export function removeFavorite(id) {
     method: 'delete'
   })
 }
+
+export function getHotVideos(limit = 10) {
+  return request({
+    url: '/search',
+    method: 'get',
+    params: { q: '', limit }
+  })
+}
+
+export function getLatestVideos(page = 1, limit = 10) {
+  return request({
+    url: '/search',
+    method: 'get',
+    params: { page, limit }
+  })
+}
