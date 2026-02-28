@@ -1,6 +1,6 @@
 import axios from 'axios'
-import apiConfig from '@/config/api'
-import { useUserStore } from '@/stores/user'
+import apiConfig from '../config/api'
+import { useUserStore } from '../stores/user'
 
 const service = axios.create({
   baseURL: apiConfig.baseURL,
