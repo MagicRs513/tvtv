@@ -1,43 +1,35 @@
 <template>
-  <view class="test-container">
-    <text class="test-text">测试页面 - 如果你看到这段文字，说明页面加载成功</text>
-    <view class="test-info">
-      <text>当前时间: {{ currentTime }}</text>
-    </view>
+  <view>
+    <text>测试页面</text>
   </view>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-
-const currentTime = ref('')
-
-onMounted(() => {
-  console.log('Test page mounted')
-  currentTime.value = new Date().toLocaleString()
-})
+<script>
+export default {
+  data() {
+    return {}
+  },
+  onLoad() {
+    console.log('测试页面加载成功')
+    uni.showToast({
+      title: '页面加载成功',
+      icon: 'success'
+    })
+  }
+}
 </script>
 
-<style scoped>
-.test-container {
-  min-height: 100vh;
-  background-color: #0d0d0d;
+<style>
+view {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 40rpx;
+  align-items: center;
+  height: 100vh;
+  background-color: #0d0d0d;
 }
 
-.test-text {
+text {
   color: #ffffff;
-  font-size: 32rpx;
-  text-align: center;
-  margin-bottom: 40rpx;
-}
-
-.test-info {
-  color: #e50914;
-  font-size: 28rpx;
+  font-size: 20px;
 }
 </style>
