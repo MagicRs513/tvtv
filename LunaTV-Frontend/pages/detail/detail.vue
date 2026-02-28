@@ -67,8 +67,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useVideoStore } from '@/stores/video'
-import { useFavoriteStore } from '@/stores/favorite'
+import { useVideoStore } from '../src/stores/video'
+import { useFavoriteStore } from '../src/stores/favorite'
 
 const videoStore = useVideoStore()
 const favoriteStore = useFavoriteStore()
