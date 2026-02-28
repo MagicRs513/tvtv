@@ -19,3 +19,7 @@ export default defineConfig({
     }
   }
 })
+
+export {
+  defineConfig
+}
