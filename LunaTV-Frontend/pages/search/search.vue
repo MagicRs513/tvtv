@@ -48,7 +48,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useVideoStore } from '../src/stores/video'
+import { useVideoStore } from '../../src/stores/video'
 
 const videoStore = useVideoStore()
 

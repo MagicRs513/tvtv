@@ -37,7 +37,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getCategories } from '../src/api/video'
+import { getCategories } from '../../src/api/video'
 
 const categories = ref([])
 const loading = ref(false)
