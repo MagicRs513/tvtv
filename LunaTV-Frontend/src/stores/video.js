@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { searchVideo, getVideoDetail } from '@/api/video'
+import { searchVideo, getVideoDetail } from '../api/video'
 
 export const useVideoStore = defineStore('video', () => {
   const searchResults = ref([])
