@@ -9,64 +9,56 @@
     {
       "path": "pages/test/test",
       "style": {
-        "navigationBarTitleText": "测试",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "测试"
       }
     },
     {
       "path": "pages/login/login",
       "style": {
-        "navigationBarTitleText": "登录",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "登录"
       }
     },
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "LunaTV",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "首页"
       }
     },
     {
       "path": "pages/search/search",
       "style": {
-        "navigationBarTitleText": "搜索",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "搜索"
       }
     },
     {
       "path": "pages/detail/detail",
       "style": {
-        "navigationBarTitleText": "详情",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "详情"
       }
     },
     {
       "path": "pages/player/player",
       "style": {
-        "navigationBarTitleText": "播放",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "播放"
       }
     },
     {
       "path": "pages/favorites/favorites",
       "style": {
-        "navigationBarTitleText": "收藏",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "收藏"
       }
     },
     {
       "path": "pages/category/category",
       "style": {
-        "navigationBarTitleText": "分类",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "分类"
       }
     }
   ],
   "globalStyle": {
-    "navigationBarTextStyle": "white",
+    "navigationBarTextStyle": "black",
     "navigationBarTitleText": "LunaTV",
-    "navigationBarBackgroundColor": "#0d0d0d",
-    "backgroundColor": "#0d0d0d"
+    "navigationBarBackgroundColor": "#ffffff",
+    "backgroundColor": "#ffffff"
   }
 }
