@@ -1,0 +1,33 @@
+{
+  "name": "LunaTV-Frontend",
+  "version": "1.0.0",
+  "description": "LunaTV 电视前端项目 - 适配 LunaTV 后端 API",
+  "main": "main.js",
+  "scripts": {
+    "dev": "npm run dev:h5",
+    "build": "npm run build:h5",
+    "dev:h5": "uni -p h5",
+    "build:h5": "uni build -p h5",
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:mp-weixin": "uni build -p mp-weixin",
+    "dev:app": "uni -p app",
+    "build:app": "uni build -p app"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "^3.0.0-alpha-4030420240930001",
+    "@dcloudio/uni-h5": "^3.0.0-alpha-4030420240930001",
+    "@dcloudio/uni-mp-weixin": "^3.0.0-alpha-4030420240930001",
+    "@dcloudio/uni-app-plus": "^3.0.0-alpha-4030420240930001",
+    "vue": "^3.4.0",
+    "pinia": "^2.1.7",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@dcloudio/vite-plugin-uni": "^3.0.0-alpha-4030420240930001",
+    "vite": "^5.0.0",
+    "sass": "^1.69.0"
+  },
+  "uni-app": {
+    "scripts": {}
+  }
+}
