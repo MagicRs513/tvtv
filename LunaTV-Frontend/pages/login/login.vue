@@ -8,7 +8,7 @@
 
       <view class="form-section">
         <view class="form-item">
-          <uni-icons type="person" size="20" color="#999"></uni-icons>
+          <text class="label">用户名</text>
           <input
             class="form-input"
             v-model="formData.username"
@@ -18,7 +18,7 @@
         </view>
 
         <view class="form-item">
-          <uni-icons type="locked" size="20" color="#999"></uni-icons>
+          <text class="label">密码</text>
           <input
             class="form-input"
             v-model="formData.password"
@@ -87,7 +87,7 @@ async function handleLogin() {
       uni.showToast({ title: '登录成功', icon: 'success' })
       
       setTimeout(() => {
-        uni.reLaunch({ url: '/pages/index/index' })
+        uni.redirectTo({ url: '/pages/index/index' })
       }, 1500)
     } else {
       uni.showToast({ title: '登录失败，请检查账号密码', icon: 'none' })
@@ -156,16 +156,20 @@ async function handleLogin() {
 
 .form-item {
   display: flex;
-  align-items: center;
-  gap: 20rpx;
+  flex-direction: column;
+  gap: 15rpx;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #fff;
+}
+
+.form-input {
   padding: 30rpx;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 12rpx;
   border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.form-input {
-  flex: 1;
   font-size: 32rpx;
   color: #fff;
 }
