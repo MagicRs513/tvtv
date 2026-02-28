@@ -61,14 +61,5 @@
     "navigationBarTitleText": "LunaTV",
     "navigationBarBackgroundColor": "#0d0d0d",
     "backgroundColor": "#0d0d0d"
-  },
-  "globalStyle": {
-    "navigationBarTextStyle": "white",
-    "navigationBarTitleText": "LunaTV",
-    "navigationBarBackgroundColor": "#0d0d0d",
-    "backgroundColor": "#0d0d0d"
-  }
-}
-    ]
   }
 }
