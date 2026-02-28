@@ -38,14 +38,21 @@
 import { ref, onMounted } from 'vue'
 import { useFavoriteStore } from '../../src/stores/favorite'
 import { useVideoStore } from '../../src/stores/video'
+import { useUserStore } from '../../src/stores/user'
 
 const favoriteStore = useFavoriteStore()
 const videoStore = useVideoStore()
+const userStore = useUserStore()
 
 const favorites = ref([])
 const loading = ref(false)
 
 onMounted(async () => {
+  if (!userStore.isLoggedIn) {
+    uni.redirectTo({ url: '/pages/login/login' })
+    return
+  }
+
   await fetchFavorites()
 })
 

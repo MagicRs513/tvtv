@@ -47,15 +47,23 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useVideoStore } from '../../src/stores/video'
+import { useUserStore } from '../../src/stores/user'
 
 const videoStore = useVideoStore()
+const userStore = useUserStore()
 
 const keyword = ref('')
 const loading = ref(false)
 const hasSearched = ref(false)
 const searchResults = ref([])
+
+onMounted(() => {
+  if (!userStore.isLoggedIn) {
+    uni.redirectTo({ url: '/pages/login/login' })
+  }
+})
 
 async function handleSearch() {
   if (!keyword.value.trim()) {

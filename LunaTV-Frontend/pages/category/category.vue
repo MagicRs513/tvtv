@@ -38,11 +38,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getCategories } from '../../src/api/video'
+import { useUserStore } from '../../src/stores/user'
 
 const categories = ref([])
 const loading = ref(false)
+const userStore = useUserStore()
 
 onMounted(async () => {
+  if (!userStore.isLoggedIn) {
+    uni.redirectTo({ url: '/pages/login/login' })
+    return
+  }
+
   await fetchCategories()
 })
 

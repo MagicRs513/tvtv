@@ -50,10 +50,12 @@
 import { ref, onMounted } from 'vue'
 import { useVideoStore } from '../../src/stores/video'
 import { useFavoriteStore } from '../../src/stores/favorite'
+import { useUserStore } from '../../src/stores/user'
 import { getHotVideos, getLatestVideos } from '../../src/api/video'
 
 const videoStore = useVideoStore()
 const favoriteStore = useFavoriteStore()
+const userStore = useUserStore()
 
 const heroList = ref([])
 const sections = ref([])
@@ -66,6 +68,11 @@ const quickActions = [
 ]
 
 onMounted(async () => {
+  if (!userStore.isLoggedIn) {
+    uni.redirectTo({ url: '/pages/login/login' })
+    return
+  }
+
   await fetchHomeData()
 })
 

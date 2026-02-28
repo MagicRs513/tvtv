@@ -69,9 +69,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { useVideoStore } from '../../src/stores/video'
 import { useFavoriteStore } from '../../src/stores/favorite'
+import { useUserStore } from '../../src/stores/user'
 
 const videoStore = useVideoStore()
 const favoriteStore = useFavoriteStore()
+const userStore = useUserStore()
 
 const video = computed(() => videoStore.currentVideo)
 const detail = computed(() => videoStore.currentDetail)
@@ -87,6 +89,11 @@ const options = ref({
 })
 
 onMounted(() => {
+  if (!userStore.isLoggedIn) {
+    uni.redirectTo({ url: '/pages/login/login' })
+    return
+  }
+
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   options.value.id = currentPage.options.id || ''
