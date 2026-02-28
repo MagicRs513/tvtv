@@ -45,11 +45,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { login } from '../../src/api/auth'
 import { useUserStore } from '../../src/stores/user'
 
 const userStore = useUserStore()
+
+onMounted(() => {
+  console.log('Login page mounted, isLoggedIn:', userStore.isLoggedIn)
+  console.log('Token:', userStore.token)
+})
 
 const formData = ref({
   username: '',
@@ -59,6 +64,8 @@ const formData = ref({
 const loading = ref(false)
 
 async function handleLogin() {
+  console.log('Login attempt, username:', formData.value.username)
+  
   if (!formData.value.username || !formData.value.password) {
     uni.showToast({ title: '请输入用户名和密码', icon: 'none' })
     return
@@ -69,14 +76,18 @@ async function handleLogin() {
   try {
     const response = await login(formData.value.username, formData.value.password)
     
+    console.log('Login response:', response)
+    
     if (response.token) {
       userStore.setToken(response.token)
       userStore.setUsername(formData.value.username)
       
+      console.log('Token saved, redirecting to index')
+      
       uni.showToast({ title: '登录成功', icon: 'success' })
       
       setTimeout(() => {
-        uni.switchTab({ url: '/pages/index/index' })
+        uni.reLaunch({ url: '/pages/index/index' })
       }, 1500)
     } else {
       uni.showToast({ title: '登录失败，请检查账号密码', icon: 'none' })

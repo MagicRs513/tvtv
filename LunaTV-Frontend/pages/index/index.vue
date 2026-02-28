@@ -68,7 +68,10 @@ const quickActions = [
 ]
 
 onMounted(async () => {
+  console.log('Index onMounted, isLoggedIn:', userStore.isLoggedIn)
+  
   if (!userStore.isLoggedIn) {
+    console.log('Not logged in, redirecting to login page')
     uni.redirectTo({ url: '/pages/login/login' })
     return
   }
